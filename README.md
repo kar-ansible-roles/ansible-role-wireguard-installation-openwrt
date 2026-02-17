@@ -48,4 +48,4 @@ MIT License
 Author Information
 ------------------
 
-This role was created in 2026 by [Karen Saakov](https://.linkedin.com/in/karen-saakov-4905571a1) DevOps Engineer Karo LLC.
+This role was created in 2026 by [Karen Saakov](https://linkedin.com/in/karen-saakov-4905571a1) DevOps Engineer Karo LLC.
