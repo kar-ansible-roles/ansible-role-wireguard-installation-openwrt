@@ -8,9 +8,9 @@ openwrt_lan_network: 10.10.0.0/24
 client_conf_path: "{{ playbook_dir }}/openwrt_{{ wg_interface }}.conf"
 
 
-block_wan_access: true
+block_wan_access: false
 
-reverse_proxy_ip: 10.10.10.5
+reverse_proxy_ip: 10.10.10.1
 
 forwarding_ports:
   - name: "HTTP"

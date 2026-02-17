@@ -17,7 +17,7 @@
 - name: Setup lan ip configuration
   command: uci set network.lan.ipaddr='10.10.0.1'
   notify: 
-    - Apply firewall
+    - Apply network
     - Restart network
 
 # Setup peer configuration
@@ -29,7 +29,7 @@
   command: uci set network.peer_client1.public_key='{{ client_public_key }}'
 
 - name: Add allowed IPs
-  command: uci add_list network.peer_client1.allowed_ips='{{ wg_client_ip }}'
+  command: uci set network.peer_client1.allowed_ips='{{ wg_client_ip }}'
   notify: 
-    - Apply firewall
+    - Apply network
     - Restart network

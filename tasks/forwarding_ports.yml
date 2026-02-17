@@ -1,19 +1,57 @@
-# - name: Get existing firewall config
-#   ansible.builtin.command: uci show firewall
-#   register: firewall_config
-#   changed_when: false
+- name: Get existing firewall config
+  ansible.builtin.command: uci show firewall
+  register: firewall_config
+  changed_when: false
 
-# - name: Ensure port forward rules
-#   ansible.builtin.shell: |
-#     uci add firewall redirect
-#     uci set firewall.@redirect[-1].name='{{ item.name }}'
-#     uci set firewall.@redirect[-1].src='wan'
-#     uci set firewall.@redirect[-1].src_dport='{{ item.src_port }}'
-#     uci set firewall.@redirect[-1].dest='lan'
-#     uci set firewall.@redirect[-1].dest_ip='{{ item.dest_ip }}'
-#     uci set firewall.@redirect[-1].dest_port='{{ item.dest_port }}'
-#     uci set firewall.@redirect[-1].proto='tcp'
-#     uci commit firewall
-#   when: "'name={{ item.name }}' not in firewall_config.stdout"
-#   notify: Restart firewall
-#   loop: "{{ forwarding_ports }}"
+- name: Create redirect section if missing
+  ansible.builtin.command: uci set firewall.{{ item.name | lower }}=redirect
+  when: ("firewall.%s=" % (item.name | lower)) not in firewall_config.stdout
+  loop: "{{ forwarding_ports }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Configure redirect name
+  ansible.builtin.command: uci set firewall.{{ item.name | lower }}.name='{{ item.name }}'
+  loop: "{{ forwarding_ports }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Configure redirect source zone
+  ansible.builtin.command: uci set firewall.{{ item.name | lower }}.src='wan'
+  loop: "{{ forwarding_ports }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Configure source port
+  ansible.builtin.command: uci set firewall.{{ item.name | lower }}.src_dport='{{ item.src_port }}'
+  loop: "{{ forwarding_ports }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+
+- name: Configure destination zone
+  ansible.builtin.command: uci set firewall.{{ item.name | lower }}.dest='lan'
+  loop: "{{ forwarding_ports }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Configure destination IP
+  ansible.builtin.command: uci set firewall.{{ item.name | lower }}.dest_ip='{{ item.dest_ip }}'
+  loop: "{{ forwarding_ports }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Configure destination port
+  ansible.builtin.command: uci set firewall.{{ item.name | lower }}.dest_port='{{ item.dest_port }}'
+  loop: "{{ forwarding_ports }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Configure protocol
+  ansible.builtin.command: uci set firewall.{{ item.name | lower }}.proto='tcp'
+  loop: "{{ forwarding_ports }}"
+  loop_control:
+    label: "{{ item.name }}"
+  notify: 
+    - Apply firewall
+    - Restart firewall

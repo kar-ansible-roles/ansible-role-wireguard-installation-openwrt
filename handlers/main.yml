@@ -1,17 +1,18 @@
 ---
 # handlers file for ansible-role-wireguard-installation-openwrt
+- name: Apply network
+  command: uci commit network
+
 - name: Restart network
   service:
     name: network
     state: restarted
-
-- name: Apply network
-  command: uci commit network
+  
+- name: Apply firewall
+  command: uci commit firewall
 
 - name: Restart firewall
   service:
     name: firewall
     state: restarted
 
-- name: Apply firewall
-  command: uci commit firewall
