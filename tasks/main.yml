@@ -1,0 +1,18 @@
+---
+# tasks file for ansible-role-wireguard-installation-openwrt
+- name: Install WireGuard packages
+  community.general.opkg:
+    name:
+      - kmod-wireguard
+      - wireguard-tools
+      - luci-proto-wireguard
+      - rpcd-mod-wireguard
+    state: present
+    update_cache: yes
+
+- include_tasks: generate_keys.yml
+- include_tasks: setup_interface.yml
+- include_tasks: setup_firewall.yml
+- include_tasks: close_ports_22_80_443.yml
+  when: block_wan_access
+- include_tasks: forwarding_ports.yml

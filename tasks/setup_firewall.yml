@@ -1,0 +1,99 @@
+
+# Zone configuration for WireGuard interface
+- name: Ensure wg zone exists
+  command: uci set firewall.wg_zone=zone
+
+- name: Set zone name
+  command: uci set firewall.@zone[-1].name='wg'
+
+- name: Attach network
+  command: uci set firewall.@zone[-1].network='{{ wg_interface }}'
+
+- name: Set input policy
+  command: uci set firewall.@zone[-1].input='ACCEPT'
+
+- name: Set output policy
+  command: uci set firewall.@zone[-1].output='ACCEPT'
+
+- name: Set forward policy
+  command: uci set firewall.@zone[-1].forward='ACCEPT'
+
+# Commit firewall configuration
+- name: Commit firewall
+  command: uci commit firewall
+  notify: Restart firewall
+
+
+# Forwarding configuration
+- name: Add forwarding section
+  command: uci set firewall.wg_lan_forward=forwarding
+
+- name: Set forwarding source
+  command: uci set firewall.wg_lan_forward.src='wg'
+
+- name: Set forwarding destination
+  command: uci set firewall.wg_lan_forward.dest='lan'
+
+- name: Add forwarding section
+  command: uci set firewall.wg_wan_forward=forwarding
+
+- name: Set forwarding source
+  command: uci set firewall.wg_wan_forward.src='wg'
+
+- name: Set forwarding destination
+  command: uci set firewall.wg_wan_forward.dest='wan'
+
+
+# Commit firewall configuration
+- name: Commit firewall
+  command: uci commit firewall
+  notify: Restart firewall
+
+
+# WAN rule configuration
+# - name: Add wg0 to firewall zone
+#   command: uci set firewall.@zone[0].network='lan wg0'
+
+- name: Add firewall rule section
+  command: uci set firewall.wg_wan_rule=rule
+
+- name: Set rule name
+  command: uci set firewall.wg_wan_rule.name='Allow-WireGuard'
+
+- name: Set rule source
+  command: uci set firewall.wg_wan_rule.src='wan'
+
+- name: Set destination port
+  command: uci set firewall.wg_wan_rule.dest_port='{{ wg_port }}'
+
+- name: Set protocol
+  command: uci set firewall.wg_wan_rule.proto='udp'
+
+- name: Set target
+  command: uci set firewall.wg_wan_rule.target='ACCEPT'
+
+# Commit firewall configuration
+- name: Commit firewall
+  command: uci commit firewall
+  notify: Restart firewall
+
+
+
+# NAT setup
+- name: Add firewall nat section
+  command: uci set firewall.wg_nat=nat
+
+- name: Set section name
+  command: uci set firewall.wg_nat.name='WireGuard-NAT'
+
+- name: Set source interface
+  command: uci set firewall.wg_nat.src='wg'
+
+- name: Set masquerade
+  command: uci set firewall.wg_nat.target='MASQUERADE'
+
+# Commit firewall configuration
+- name: Commit firewall
+  command: uci commit firewall
+  notify: Restart firewall
+

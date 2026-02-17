@@ -1,0 +1,39 @@
+# Setup {{ wg_interface }} configuration
+- name: Create wg interface if missing
+  command: uci set network.{{ wg_interface }}='interface'
+
+- name: Set proto
+  command: uci set network.{{ wg_interface }}.proto='wireguard'
+
+- name: Set private key
+  command: uci set network.{{ wg_interface }}.private_key='{{ server_private_key }}'
+
+- name: Set listen port
+  command: uci set network.{{ wg_interface }}.listen_port='{{ wg_port }}'
+
+- name: Set wg address if not present
+  command: uci set network.{{ wg_interface }}.addresses='{{ wg_network }}'
+
+- name: Setup lan ip configuration
+  command: uci set network.lan.ipaddr='10.10.0.1'
+
+# Commit network
+- name: Commit network config
+  command: uci commit network
+  notify: Restart network
+
+# Setup peer configuration
+- name: Add peer section
+  command: uci set network.peer_client1=wireguard_{{ wg_interface }}
+  register: peer_section
+
+- name: Set peer public key
+  command: uci set network.peer_client1.public_key='{{ client_public_key }}'
+
+- name: Add allowed IPs
+  command: uci add_list network.peer_client1.allowed_ips='{{ wg_client_ip }}'
+
+# Commit network
+- name: Commit network config
+  command: uci commit network
+  notify: Restart network

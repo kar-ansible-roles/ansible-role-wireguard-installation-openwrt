@@ -1,0 +1,84 @@
+- name: Ensure Wireguard directory is exist
+  file:
+    dest: /etc/wireguard
+    state: directory
+    recurse: yes
+
+- name: Ensure server private key exists
+  ansible.builtin.stat:
+    path: /etc/wireguard/server_private.key
+  register: server_key_file
+
+- name: Load existing server private key
+  ansible.builtin.slurp:
+    src: /etc/wireguard/server_private.key
+  register: server_private_key_data
+  when: server_key_file.stat.exists
+
+- name: Set server_private_key fact
+  ansible.builtin.set_fact:
+    server_private_key: "{{ server_private_key_data.content | b64decode | trim }}"
+  when: server_key_file.stat.exists
+
+- name: Generate server private key if missing
+  ansible.builtin.shell: wg genkey
+  register: server_private_key_result
+  when: not server_key_file.stat.exists
+
+- name: Set server_private_key from newly generated key
+  ansible.builtin.set_fact:
+    server_private_key: "{{ server_private_key_result.stdout | trim }}"
+  when: not server_key_file.stat.exists
+
+- name: Write server_private_key into /etc/wireguard/server_private.key
+  copy:
+    content: "{{ server_private_key }}"
+    dest: /etc/wireguard/server_private.key
+  when: not server_key_file.stat.exists
+
+- name: Generate server public key
+  ansible.builtin.shell: "echo -n '{{ server_private_key }}' | wg pubkey"
+  register: server_public_key_result
+
+- name: Set server_public_key from newly generated key
+  ansible.builtin.set_fact:
+    server_public_key: "{{ server_public_key_result.stdout | trim }}"
+
+- name: Ensure client private key exists
+  ansible.builtin.stat:
+    path: /etc/wireguard/client_private.key
+  register: client_key_file
+
+- name: Generate client private key if missing
+  ansible.builtin.shell: wg genkey
+  register: client_private_key_result
+  when: not client_key_file.stat.exists
+
+- name: Set client_private_key from newly generated key
+  ansible.builtin.set_fact:
+    client_private_key: "{{ client_private_key_result.stdout | trim }}"
+  when: not client_key_file.stat.exists
+
+- name: Generate client public key
+  ansible.builtin.shell: "echo -n '{{ client_private_key }}' | wg pubkey"
+  register: client_public_key_result
+
+- name: Set client_public_key from newly generated key
+  ansible.builtin.set_fact:
+    client_public_key: "{{ client_public_key_result.stdout | trim }}"
+
+- name: Save client config locally
+  ansible.builtin.copy:
+    dest: "{{ client_conf_path }}"
+    content: |
+      [Interface]
+      PrivateKey = {{ client_private_key }}
+      Address = {{ wg_client_ip }}
+      DNS = 1.1.1.1, 8.8.8.8
+
+      [Peer]
+      PublicKey = {{ server_public_key }}
+      Endpoint = {{ ansible_host }}:{{ wg_port }}
+      AllowedIPs = 0.0.0.0/0
+      PersistentKeepalive = 25
+  delegate_to: localhost
