@@ -49,6 +49,17 @@
     path: /etc/wireguard/client_private.key
   register: client_key_file
 
+- name: Load existing client private key
+  ansible.builtin.slurp:
+    src: /etc/wireguard/client_private.key
+  register: client_private_key_data
+  when: client_key_file.stat.exists
+
+- name: Set client_private_key fact
+  ansible.builtin.set_fact:
+    client_private_key: "{{ client_private_key_data.content | b64decode | trim }}"
+  when: client_key_file.stat.exists
+
 - name: Generate client private key if missing
   ansible.builtin.shell: wg genkey
   register: client_private_key_result
@@ -66,6 +77,13 @@
 - name: Set client_public_key from newly generated key
   ansible.builtin.set_fact:
     client_public_key: "{{ client_public_key_result.stdout | trim }}"
+
+- name: Write client_private_key into /etc/wireguard/client_private.key
+  copy:
+    content: "{{ client_private_key }}"
+    dest: /etc/wireguard/client_private.key
+  when: not client_key_file.stat.exists
+
 
 - name: Save client config locally
   ansible.builtin.copy:
