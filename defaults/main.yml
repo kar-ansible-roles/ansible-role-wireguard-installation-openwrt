@@ -1,17 +1,19 @@
 ---
 # defaults file for ansible-role-wireguard-installation-openwrt
-wg_interface: wg0
-wg_port: 51820
+openwrt_new_password: MyStrongPassword
+block_wan_access: false
+
+
+wg_server_interface: wg0
+wg_server_port: 51820
 wg_network: 10.10.10.1/24
 wg_client_ip: 10.10.10.70/32
 openwrt_lan_network: 10.10.0.0/24
-client_conf_path: "{{ playbook_dir }}/openwrt_{{ wg_interface }}.conf"
+wg_client_conf_path: "{{ playbook_dir }}/openwrt_{{ wg_server_interface }}.conf"
 
 
-block_wan_access: false
-
+enable_port_forward: false
 reverse_proxy_ip: 10.10.10.1
-
 forwarding_ports:
   - name: "HTTP"
     src_port: 80

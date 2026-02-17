@@ -1,21 +1,21 @@
 
 # Zone configuration for WireGuard interface
-- name: Ensure wg zone exists
+- name: Setting up Firewall | Ensure wg zone exists
   command: uci set firewall.wg_zone=zone
 
-- name: Set zone name
+- name: Setting up Firewall | Set zone name
   command: uci set firewall.@zone[-1].name='wg'
 
-- name: Attach network
-  command: uci set firewall.@zone[-1].network='{{ wg_interface }}'
+- name: Setting up Firewall | Attach network
+  command: uci set firewall.@zone[-1].network='{{ wg_server_interface }}'
 
-- name: Set input policy
+- name: Setting up Firewall | Set input policy
   command: uci set firewall.@zone[-1].input='ACCEPT'
 
-- name: Set output policy
+- name: Setting up Firewall | Set output policy
   command: uci set firewall.@zone[-1].output='ACCEPT'
 
-- name: Set forward policy
+- name: Setting up Firewall | Set forward policy
   command: uci set firewall.@zone[-1].forward='ACCEPT'
   notify: 
     - Apply firewall
@@ -23,44 +23,44 @@
 
 
 # Forwarding configuration
-- name: Add forwarding section
+- name: Setting up Firewall | Add forwarding section
   command: uci set firewall.wg_lan_forward=forwarding
 
-- name: Set forwarding source
+- name: Setting up Firewall | Set forwarding source
   command: uci set firewall.wg_lan_forward.src='wg'
 
-- name: Set forwarding destination
+- name: Setting up Firewall | Set forwarding destination
   command: uci set firewall.wg_lan_forward.dest='lan'
 
-- name: Add forwarding section
+- name: Setting up Firewall | Add forwarding section
   command: uci set firewall.wg_wan_forward=forwarding
 
-- name: Set forwarding source
+- name: Setting up Firewall | Set forwarding source
   command: uci set firewall.wg_wan_forward.src='wg'
 
-- name: Set forwarding destination
+- name: Setting up Firewall | Set forwarding destination
   command: uci set firewall.wg_wan_forward.dest='wan'
   notify: 
     - Apply firewall
     - Restart firewall
 
 
-- name: Add firewall rule section
+- name: Setting up Firewall | Add firewall rule section
   command: uci set firewall.wg_wan_rule=rule
 
-- name: Set rule name
+- name: Setting up Firewall | Set rule name
   command: uci set firewall.wg_wan_rule.name='Allow-WireGuard'
 
-- name: Set rule source
+- name: Setting up Firewall | Set rule source
   command: uci set firewall.wg_wan_rule.src='wan'
 
-- name: Set destination port
-  command: uci set firewall.wg_wan_rule.dest_port='{{ wg_port }}'
+- name: Setting up Firewall | Set destination port
+  command: uci set firewall.wg_wan_rule.dest_port='{{ wg_server_port }}'
 
-- name: Set protocol
+- name: Setting up Firewall | Set protocol
   command: uci set firewall.wg_wan_rule.proto='udp'
 
-- name: Set target
+- name: Setting up Firewall | Set target
   command: uci set firewall.wg_wan_rule.target='ACCEPT'
   notify: 
     - Apply firewall
@@ -69,16 +69,16 @@
 
 
 # NAT setup
-- name: Add firewall nat section
+- name: Setting up Firewall | Add firewall nat section
   command: uci set firewall.wg_nat=nat
 
-- name: Set section name
+- name: Setting up Firewall | Set section name
   command: uci set firewall.wg_nat.name='WireGuard-NAT'
 
-- name: Set source interface
+- name: Setting up Firewall | Set source interface
   command: uci set firewall.wg_nat.src='wg'
 
-- name: Set masquerade
+- name: Setting up Firewall | Set masquerade
   command: uci set firewall.wg_nat.target='MASQUERADE'
   notify: 
     - Apply firewall
