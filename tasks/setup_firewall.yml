@@ -17,11 +17,9 @@
 
 - name: Set forward policy
   command: uci set firewall.@zone[-1].forward='ACCEPT'
-
-# Commit firewall configuration
-- name: Commit firewall
-  command: uci commit firewall
-  notify: Restart firewall
+  notify: 
+    - Apply firewall
+    - Restart firewall
 
 
 # Forwarding configuration
@@ -42,17 +40,10 @@
 
 - name: Set forwarding destination
   command: uci set firewall.wg_wan_forward.dest='wan'
+  notify: 
+    - Apply firewall
+    - Restart firewall
 
-
-# Commit firewall configuration
-- name: Commit firewall
-  command: uci commit firewall
-  notify: Restart firewall
-
-
-# WAN rule configuration
-# - name: Add wg0 to firewall zone
-#   command: uci set firewall.@zone[0].network='lan wg0'
 
 - name: Add firewall rule section
   command: uci set firewall.wg_wan_rule=rule
@@ -71,11 +62,9 @@
 
 - name: Set target
   command: uci set firewall.wg_wan_rule.target='ACCEPT'
-
-# Commit firewall configuration
-- name: Commit firewall
-  command: uci commit firewall
-  notify: Restart firewall
+  notify: 
+    - Apply firewall
+    - Restart firewall
 
 
 
@@ -91,9 +80,7 @@
 
 - name: Set masquerade
   command: uci set firewall.wg_nat.target='MASQUERADE'
-
-# Commit firewall configuration
-- name: Commit firewall
-  command: uci commit firewall
-  notify: Restart firewall
+  notify: 
+    - Apply firewall
+    - Restart firewall
 

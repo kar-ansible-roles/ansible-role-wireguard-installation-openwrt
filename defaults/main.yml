@@ -9,6 +9,16 @@ client_conf_path: "{{ playbook_dir }}/openwrt_{{ wg_interface }}.conf"
 
 
 block_wan_access: true
-# forwarding_ports =
-#   - { name: 'HTTP', src_port: 80, dest_port: 80 }
-#   - { name: 'HTTPS', src_port: 443, dest_port: 443 }
+
+reverse_proxy_ip: 10.10.10.5
+
+forwarding_ports:
+  - name: "HTTP"
+    src_port: 80
+    dest_port: 80
+    dest_ip: "{{ reverse_proxy_ip }}"
+
+  - name: "HTTPS"
+    src_port: 443
+    dest_port: 443
+    dest_ip: "{{ reverse_proxy_ip }}"

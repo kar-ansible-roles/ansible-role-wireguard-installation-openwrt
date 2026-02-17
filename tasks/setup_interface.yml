@@ -16,11 +16,9 @@
 
 - name: Setup lan ip configuration
   command: uci set network.lan.ipaddr='10.10.0.1'
-
-# Commit network
-- name: Commit network config
-  command: uci commit network
-  notify: Restart network
+  notify: 
+    - Apply firewall
+    - Restart network
 
 # Setup peer configuration
 - name: Add peer section
@@ -32,8 +30,6 @@
 
 - name: Add allowed IPs
   command: uci add_list network.peer_client1.allowed_ips='{{ wg_client_ip }}'
-
-# Commit network
-- name: Commit network config
-  command: uci commit network
-  notify: Restart network
+  notify: 
+    - Apply firewall
+    - Restart network

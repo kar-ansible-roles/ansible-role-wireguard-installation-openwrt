@@ -5,7 +5,13 @@
     name: network
     state: restarted
 
+- name: Apply network
+  command: uci commit network
+
 - name: Restart firewall
   service:
     name: firewall
     state: restarted
+
+- name: Apply firewall
+  command: uci commit firewall
