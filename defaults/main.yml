@@ -1,6 +1,5 @@
 ---
 # defaults file for ansible-role-wireguard-installation-openwrt
-openwrt_new_password: MyStrongPassword
 block_wan_access: false
 
 

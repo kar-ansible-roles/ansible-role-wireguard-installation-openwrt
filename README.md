@@ -14,7 +14,6 @@ Role Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `openwrt_new_password` | `MyStrongPassword` | New password to root user openwrt |
 | `block_wan_access` | `false` | Blocking of external control ports of the router |
 | `wg_server_interface` | `wg0` | Name of creation wireguard interface |
 | `wg_server_port` | `51820` | Wireguard listening port 51820 |

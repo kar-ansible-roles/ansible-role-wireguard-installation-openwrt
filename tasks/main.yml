@@ -16,11 +16,6 @@
 - include_tasks: forwarding_ports.yml
   when: enable_port_forward
 
-- name: Set root password
-  ansible.builtin.shell: |
-    printf "%s\n%s\n" "{{ openwrt_new_password }}" "{{ openwrt_new_password }}" | passwd root
-  no_log: true
-
 - name: Disable Allow-Admin rule
   ansible.builtin.command: uci set firewall.breach.enabled='0'
   when: block_wan_access
