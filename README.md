@@ -20,7 +20,7 @@ Role Variables
 | `wg_network` | `10.10.10.1/24` | CIDR Wireguard Server |
 | `wg_client_ip` | `10.10.10.70/32` | CIDR Wireguard peer(client) |
 | `openwrt_lan_network` | `10.10.0.0/24` | LAN network |
-| `wg_client_conf_path` | "{{ playbook_dir }}/openwrt_{{ wg_server_interface }}.conf" | Place to export wireguard configuaration |
+| `wg_client_conf_path` | `"{{ playbook_dir }}/openwrt_{{ wg_server_interface }}.conf"` | Place to export wireguard configuaration |
 | `enable_port_forward` | `false` | Enable port forwarding to reverse proxy |
 | `reverse_proxy_ip` | `10.10.10.1` | Add reverse proxy ip (use only with enable_port_forward: true) |
 | `forwarding_ports` | `[HTTP: [...], HTTPS: []]` | Add ports to forwarding (use only with enable_port_forward: true), correct define below |
