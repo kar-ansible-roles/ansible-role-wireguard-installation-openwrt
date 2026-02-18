@@ -1,4 +1,4 @@
-Role Name
+Wireguard installation to openwrt
 =========
 [![OpenWrt](https://img.shields.io/badge/OpenWrt-24.10.5-brightgreen?logo=openwrt)](https://openwrt.org/)
 
